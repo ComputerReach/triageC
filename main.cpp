@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <cstring>
 using namespace std;
+
 void helpMenu();
 string comments();
 void writeToFile(string collectedInfo, string triageNum);
 string getTriageNumber(string theId);
+
 int main(int argc, char *argv[])
 {
 	string data, idNum="";
@@ -38,18 +40,22 @@ int main(int argc, char *argv[])
 	cout << "---------------------------------------------------------------" << endl;
 	cout << "-------Hello and welcome to the automatic triage script--------" << endl;
 	cout << "----rewritten in C by Dominic DiPasquale for Computer Reach----" << endl;
-	cout << "---------------------------------------------------------------" << endl;
-	//ask user for the triage number if one is not supplied
-	
+	cout << "---------------------------------------------------------------" << endl;	
 	idNum = getTriageNumber(idNum);
 	data = data + comments();
 	writeToFile(data, idNum);
 }
+/*
+	Displays a simple help menu, outlining the different command line options
+	@param | none
+	@return | void
+*/
 void helpMenu()
 {
 	cout << "This is the triage application, used to extract data from" << endl;
 	cout << "refurbished Mac and Linux computers. It is written in C/C++" << endl;
-	cout << "by Dominic DiPasquale. " << endl;
+	cout << "by Dominic DiPasquale. Source is avaliable here:" << endl;
+	cout << "https://github.com/domtheporcupine/triageC" << endl;
 	cout << "----------------------" << endl;
 	cout << "Usage: crdata [options]" << endl;
 	cout << "Options:" << endl;
@@ -59,6 +65,15 @@ void helpMenu()
 	cout << "\n\nPlease report all bugs to Kevin/Dom" << endl;
 
 }
+/*
+	This function makes sure that the CRT number has been assigned and is a minimum of
+	5 numbers long.
+	
+	@param string | value of nothing if the number was not given as a command line argument
+	 or some value passed as a command line argument
+	
+	@return: string | minimum of 5 charcters	
+*/
 string getTriageNumber(string theId)
 {
 	if(theId.length() >= 5)
@@ -78,6 +93,14 @@ string getTriageNumber(string theId)
 	}
 	return id;
 }
+/*
+	This function prompts the user for additional comments as well as asking
+	for the 'okay' to confirm the computer and generated report are acceptable
+	
+	@param: none
+	
+	@return: string | the comments as given by the user
+*/
 string comments()
 {
 	cout << "Please review the above synopsis and provide any comments you deem" << endl;
