@@ -47,8 +47,10 @@ int main(int argc, char *argv[])
 }
 /*
 	Displays a simple help menu, outlining the different command line options
-	@param | none
-	@return | void
+	@params:
+		 none
+	@return:
+		void
 */
 void helpMenu()
 {
@@ -69,10 +71,12 @@ void helpMenu()
 	This function makes sure that the CRT number has been assigned and is a minimum of
 	5 numbers long.
 	
-	@param string | value of nothing if the number was not given as a command line argument
-	 or some value passed as a command line argument
+	@params:
+		string  theId | value of nothing if the number was not given as a command line argument
+		or some value passed as a command line argument
 	
-	@return: string | minimum of 5 charcters	
+	@return: 
+		string | minimum of 5 charcters	
 */
 string getTriageNumber(string theId)
 {
@@ -113,6 +117,13 @@ string comments()
 	cout << comment;
 	return comment;
 }
+/*
+	This function writes all the collected data to a .triage.txt file
+	with the same name as the CRT number
+
+	@param string
+
+*/
 void writeToFile(string collectedInfo, string triageNum)
 {
 	ofstream newFile;
