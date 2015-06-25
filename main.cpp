@@ -4,6 +4,8 @@
 #include <fstream>
 #include <stdlib.h>
 #include <cstring>
+#include <curses.h>
+#include <ncurses.h>
 using namespace std;
 
 void helpMenu();
@@ -14,19 +16,19 @@ string getTriageNumber(string theId);
 int main(int argc, char *argv[])
 {
 	string data, idNum="";
-	for(int i = 0; i < argc; i++)
+	for(int i = 1; i < argc; i++)
 	{
 		if(strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
 		{
 			helpMenu();
 			exit(0);
 		}
-		if(strcmp(argv[i], "-v") ==0)
+		else if(strcmp(argv[i], "-v") ==0)
 		{
 			cout << "Version 0.0.1 Artisan Deblin" << endl;
 			exit(0);
 		}
-		if(strcmp(argv[i], "-crn") == 0)
+		else if(strcmp(argv[i], "-crn") == 0)
 		{
 			if(argc < i+2)
 			{
@@ -35,6 +37,22 @@ int main(int argc, char *argv[])
 			}	
 			idNum = argv[i+1];
 		}
+		else
+		{
+			initscr();
+			addstr("BLINKS");
+			addch('H' | A_BLINK);
+			refresh();
+			getch();
+			endwin();
+			cout << "Unknown option \'" << argv[i] << "\';" << endl;
+			cout << "ABORT!ABORT!ABORT!\nABANDON SHIP!!!!!!\nMAYDAY!!!MAYDAY!!!" << endl;
+			cout << "YOU FORGOT HOW TO READ THE HELP MENU!!!" << endl;
+			cout << "Try using \'-h\' or \'--help\' for usage options." << endl;
+			cin >> data;
+			exit(1);
+		}
+		
 	}	
 
 	cout << "---------------------------------------------------------------" << endl;
@@ -83,27 +101,28 @@ string getTriageNumber(string theId)
 	if(theId.length() >= 5)
 		return theId;
 	cout << "Please enter the Computer Reach given identification code\n: ";
-	string id;
-	cin >> id;
+	cin >> theId;
+	
 	if(theId.length() < 5)
 	{
-		do
 		{
 			cout << "-----" << endl;
 			cout << "Code is too few characters, please enter a 5 digit code" << endl;
 			cout << "or contact Kevin/Dom\n:";
-			cin >> id;
+			cin >> theId;
 		}while(theId.length() < 5);
 	}
-	return id;
+	return theId;
 }
 /*
 	This function prompts the user for additional comments as well as asking
 	for the 'okay' to confirm the computer and generated report are acceptable
 	
-	@param: none
+	@params: 
+		none
 	
-	@return: string | the comments as given by the user
+	@return: 
+		string | the comments as given by the user
 */
 string comments()
 {
@@ -121,7 +140,11 @@ string comments()
 	This function writes all the collected data to a .triage.txt file
 	with the same name as the CRT number
 
-	@param string
+	@params:
+		string collectedInfo | info collected by the script and the comments given by the user
+		string triageNum | the CRT identification number
+	@return:
+		none
 
 */
 void writeToFile(string collectedInfo, string triageNum)
