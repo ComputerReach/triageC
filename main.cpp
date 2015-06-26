@@ -4,8 +4,6 @@
 #include <fstream>
 #include <stdlib.h>
 #include <cstring>
-#include <curses.h>
-#include <ncurses.h>
 using namespace std;
 
 void helpMenu();
@@ -39,17 +37,12 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			initscr();
-			addstr("BLINKS");
-			addch('H' | A_BLINK);
-			refresh();
-			getch();
-			endwin();
 			cout << "Unknown option \'" << argv[i] << "\';" << endl;
 			cout << "ABORT!ABORT!ABORT!\nABANDON SHIP!!!!!!\nMAYDAY!!!MAYDAY!!!" << endl;
 			cout << "YOU FORGOT HOW TO READ THE HELP MENU!!!" << endl;
 			cout << "Try using \'-h\' or \'--help\' for usage options." << endl;
-			cin >> data;
+			cout << "Press any key to continue" << endl;
+			getline(cin, data);
 			exit(1);
 		}
 		
