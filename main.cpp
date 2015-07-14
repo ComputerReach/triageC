@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 			{
 				cout << "You have not entered a number, program will now exit" << endl;
 				exit(1);
-			}	
+			}
 			idNum = argv[i+1];
 		}
 		else
@@ -45,13 +45,13 @@ int main(int argc, char *argv[])
 			getline(cin, data);
 			exit(1);
 		}
-		
-	}	
+
+	}
 
 	cout << "---------------------------------------------------------------" << endl;
 	cout << "-------Hello and welcome to the automatic triage script--------" << endl;
 	cout << "----rewritten in C by Dominic DiPasquale for Computer Reach----" << endl;
-	cout << "---------------------------------------------------------------" << endl;	
+	cout << "---------------------------------------------------------------" << endl;
 	idNum = getTriageNumber(idNum);
 	data = data + comments();
 	writeToFile(data, idNum);
@@ -81,13 +81,13 @@ void helpMenu()
 /*
 	This function makes sure that the CRT number has been assigned and is a minimum of
 	5 numbers long.
-	
+
 	@params:
 		string  theId | value of nothing if the number was not given as a command line argument
 		or some value passed as a command line argument
-	
-	@return: 
-		string | minimum of 5 charcters	
+
+	@return:
+		string | minimum of 5 charcters
 */
 string getTriageNumber(string theId)
 {
@@ -95,26 +95,30 @@ string getTriageNumber(string theId)
 		return theId;
 	cout << "Please enter the Computer Reach given identification code\n: ";
 	cin >> theId;
-	
+
 	if(theId.length() < 5)
 	{
 		{
 			cout << "-----" << endl;
 			cout << "Code is too few characters, please enter a 5 digit code" << endl;
-			cout << "or contact Kevin/Dom\n:";
+			cout << "or contact Kevin/Dom\n: ";
 			cin >> theId;
 		}while(theId.length() < 5);
 	}
+	cin.clear();
+	cin.ignore();
 	return theId;
 }
 /*
 	This function prompts the user for additional comments as well as asking
 	for the 'okay' to confirm the computer and generated report are acceptable
-	
-	@params: 
+	if this is not given the program will ask until the user enters the designated
+	keyword
+
+	@params:
 		none
-	
-	@return: 
+
+	@return:
 		string | the comments as given by the user
 */
 string comments()
@@ -126,6 +130,23 @@ string comments()
 	cout << "------------------------\n: ";
 	string comment;
 	getline(cin, comment);
+	bool commentCheck = false;
+	do
+	{
+		if(comment.find("@okay") == string::npos && comment.find("@notokay") == string::npos)
+		{
+			cout << "No seriously I need you to have a minimum of '@okay' or @notokay in that comment" << endl;
+			cout << "Press enter to continue..." << endl;
+			getline(cin, comment);
+			cout << "-------------------------" << endl;
+			cout << "Please enter your comments or just '@okay' or '@notokay'\n: ";
+			getline(cin, comment);
+		} 
+		else 
+		{
+			commentCheck = true;
+		}
+	}while(!commentCheck);
 	cout << comment;
 	return comment;
 }
@@ -150,4 +171,4 @@ void writeToFile(string collectedInfo, string triageNum)
 		newFile << collectedInfo;
 	}
 	newFile.close();
-} 
+}
