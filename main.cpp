@@ -56,8 +56,15 @@ int main(int argc, char *argv[])
 	cout << "----rewritten in C by Dominic DiPasquale for Computer Reach----" << endl;
 	cout << "---------------------------------------------------------------" << endl;
 	idNum = getTriageNumber(idNum);
+	if(macOrLinux())
+	{
+		cout << "Linux computer detected!..." << endl;
+	}
+	else
+	{
+		cout << "OSX computer detected!..." << endl;
+	}
 	data = data + comments();
-	macOrLinux();
 	writeToFile(data, idNum);
 }
 /*
@@ -139,7 +146,7 @@ string comments()
 	{
 		if(comment.find("@okay") == string::npos && comment.find("@notokay") == string::npos)
 		{
-			cout << "No seriously I need you to have a minimum of '@okay' or @notokay in that comment" << endl;
+			cout << "No, seriously I need you to have a minimum of '@okay' or @notokay in that comment." << endl;
 			cout << "Press enter to continue..." << endl;
 			getline(cin, comment);
 			cout << "-------------------------" << endl;
@@ -151,7 +158,6 @@ string comments()
 			commentCheck = true;
 		}
 	}while(!commentCheck);
-	cout << comment;
 	return comment;
 }
 /*
@@ -179,6 +185,11 @@ void writeToFile(string collectedInfo, string triageNum)
 /*
 	This function uses the uname command to determine the type of system it is running on as the commands 
 	used in this program are specific to either Linux or OSX
+
+	@params:
+		none
+	@return:
+		bool | true if the computer is a Liunx computer and false if the computer is OSX
 */
 bool macOrLinux()
 {
@@ -186,6 +197,13 @@ bool macOrLinux()
 	struct utsname darwinLinux;
 	uname(&darwinLinux);
 	sysType = darwinLinux.sysname;
-	cout << sysType << endl;
+	if(sysType.compare("Linux") == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 		
