@@ -1,15 +1,18 @@
-#include <iostream>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <cstring>
+#include <stdio.h>
+#include <sys/utsname.h>
 using namespace std;
 
 void helpMenu();
 string comments();
 void writeToFile(string collectedInfo, string triageNum);
 string getTriageNumber(string theId);
+bool macOrLinux();
+
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +48,7 @@ int main(int argc, char *argv[])
 			getline(cin, data);
 			exit(1);
 		}
-
+		
 	}
 
 	cout << "---------------------------------------------------------------" << endl;
@@ -54,6 +57,7 @@ int main(int argc, char *argv[])
 	cout << "---------------------------------------------------------------" << endl;
 	idNum = getTriageNumber(idNum);
 	data = data + comments();
+	macOrLinux();
 	writeToFile(data, idNum);
 }
 /*
@@ -172,3 +176,16 @@ void writeToFile(string collectedInfo, string triageNum)
 	}
 	newFile.close();
 }
+/*
+	This function uses the uname command to determine the type of system it is running on as the commands 
+	used in this program are specific to either Linux or OSX
+*/
+bool macOrLinux()
+{
+	string sysType;
+	struct utsname darwinLinux;
+	uname(&darwinLinux);
+	sysType = darwinLinux.sysname;
+	cout << sysType << endl;
+}
+		
