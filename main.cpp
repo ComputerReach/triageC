@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		cout << "OSX computer detected!..." << endl;
+		getMacData();
 	}
 	data = data + comments();
 	writeToFile(data, idNum);
@@ -242,9 +243,61 @@ string runCmd(string cmd)
 	return temp;
 }
 /*
+	This function is used to collect data about a Mac computer through the use of system_profiler
+	right now at computer reach the GUI version is used, but this can be much quicker
+
+	@params:
+		none
+	@return:
+		string | a multi-line string with all of the collected data nicely formatted
 */	
 string getMacData()
 {
+	/*
+		Manufacturer
+		Model
+		Serial Number
+			system_profiler SPHardwareDataType
+		------------------
+		USB ports 
+			system_profiler SPUSBDataType 'Built-in USB'
+		------------------
+		Video ports (VGA/HDMI/DVI)
+		PS2
+			user must enter these values
+		------------------
+		Ethernet
+		Wifi
+			system_profiler SPNetworkDataType 'Wi-Fi'
+		-----------------
+		Headphone
+		Mic
+			system_profiler SPAudioDataType
+		----------------
+		CD/DVD drive
+			system_profiler SPDiscBurningDataType
+		----------------
+		OS version
+			system_prfiler SPSoftwareDataType
+		Processor Speed
+		Ram Size
+			
+		HDD Size
+		64/32bit
+			uname -a
+	*/
+	string allData = "-----------------------\nManufacturer: Apple\n";
+	string data = runCmd("system_profiler SPHardwareDataType");
+	
+	istringstream iss(data);
+    for(string line; getline(iss, line);)
+    {
+		if(line.find("Model Identifier") != string::npos)
+			cout << line << endl;	
+
+		if(line.find("Serial") != string::npos)
+			cout << line << endl;
+	}
 	return "";
 }
 /*
