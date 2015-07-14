@@ -17,6 +17,8 @@ string getMacData();
 string getLinuxData();
 bool macOrLinux();
 string runCmd(string cmd);
+string removeSubString(string original, string toRemove);
+
 
 int main(int argc, char *argv[])
 {
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
 	if(macOrLinux())
 	{
 		cout << "Linux computer detected!..." << endl;
-		getLinuxData();
+		cout << getLinuxData();
 	}
 	else
 	{
@@ -189,9 +191,17 @@ void writeToFile(string collectedInfo, string triageNum)
 	newFile.close();
 }
 /*
+	This function is used to collect all the necessary information about
+	a triaged linux computer
+	
+	@params
+		none
+	@return
+		string | all collected data properly formatted, rather long
 */
 string getLinuxData()
 {
+	string finalData = "--------------------\n";
 	string data = runCmd("sudo dmidecode -t system");
 	string temp = "";
 	istringstream iss(data);
@@ -199,18 +209,159 @@ string getLinuxData()
 	{
 		if(line.find("Manu") != string::npos)
 		{
-			line.erase(remove(line.begin(), line.end(), '\t'), line.end());
-
-			cout << line << endl;
-		
+			line = removeSubString(line, "\t");
+			finalData += line;
+			finalData += "\n-------------------\n";	
 		}
 		if(line.find("Version") != string::npos)
-			cout << line << endl;
+		{
+			line = removeSubString(line, "\t");
+			line = line.replace(line.find("Version"), 7, "Model");
+			finalData += line;
+			finalData += "\n--------------------\n";
+		}
 		if(line.find("Serial") != string::npos)
-			cout << line << endl;	
+		{
+			line = removeSubString(line, "\t");
+			finalData += line;
+			finalData += "\n--------------------\n";
+		}	
 
 	}
-	return data;
+	
+
+	bool USB = false;
+	bool ETHERNET = false;
+	bool VGA = false;
+	bool DVI = false;
+	bool HDMI = false;
+	bool PS2 = false;
+	bool WIFI = false;
+	bool MIC = false;
+	bool HEAD = false;
+
+	data = runCmd("sudo dmidecode");
+	int usbCount = 0;
+	istringstream ss(data);
+	for(string line; getline(ss, line);)
+	{
+		if(line.find("External") != string::npos)
+		{
+			if(line.find("USB)") != string::npos)
+			{
+				USB = true;
+				usbCount += 1;
+			}
+			if(line.find("Ethernet") != string::npos)
+				ETHERNET = true;
+			if(line.find("PS/2") != string::npos)
+				PS2 = true;
+			if(line.find("Headphone") != string::npos)
+				HEAD = true;
+			if(line.find("Microphone") != string::npos)
+				MIC = true;
+			if(line.find("DVI") != string::npos)
+				DVI = true;
+			if(line.find("HDMI") != string::npos)
+				HDMI = true;
+		}
+	}
+
+
+	data = runCmd("lspci");
+	istringstream sis(data);
+	for(string line; getline(sis, line);)
+	{
+		if(line.find("Network controller") != string::npos)
+			WIFI = true;
+		if(line.find("VGA compatible") != string::npos)
+			VGA = true;
+	}
+	
+	
+	data = runCmd("sudo fdisk -l");
+	istringstream ssi(data);	
+	string hddSize;
+	for(string line; getline(ssi, line);)
+	{
+		if(line.find("Disk /dev/sda") != string::npos)
+		{
+			line = line.replace(line.find("Disk /dev/sda:"), 14, "");
+			line = line.replace(line.find(","), line.length()+1, "");
+			hddSize = line;
+		}
+	}
+	
+	
+	bool CD = false;
+	bool DVD = false;
+	bool CDR = false;
+	bool DVDR = false;
+
+	data = runCmd("cat /proc/sys/dev/cdrom/info");		
+	istringstream nss(data);
+	for(string line; getline(nss, line);)
+	{
+		if(line.find("play audio") != string::npos && line.find("1") != string::npos)
+			CD = true;
+		if(line.find("read DVD") != string::npos && line.find("1") != string::npos)
+			DVD = true;
+		if(line.find("write CD-RW") != string::npos && line.find("1") != string::npos)
+			CDR = true;
+		if(line.find("write DVD-R") != string::npos && line.find("1") != string::npos)
+			DVDR = true;
+	}
+
+
+
+
+
+	finalData += "Video Devices:\n";
+	if(VGA)
+		finalData += "-VGA\n";
+	if(DVI)
+		finalData += "-DVI\n";
+	if(HDMI)
+		finalData += "-HDMI\n";
+	finalData += "--------------------\nPorts:\n";
+	if(ETHERNET)
+		finalData += "-ETHERNET\n";
+	if(USB)
+		finalData += "-USB x " + usbCount + '\n';
+	if(PS2)
+		finalData += "-PS/2\n";
+	finalData += "--------------------\nOther Ports:\n";
+	if(HEAD)
+		finalData += "-Headphone\n";
+	if(MIC)
+		finalData += "-Microphone\n";
+	finalData += "--------------------\n";
+	finalData += "HDD Size: " + hddSize + '\n';
+	finalData += "--------------------\n";
+	if(CD && !DVD)
+		finalData += "CD/DVD Drive: CD\n";
+	if(CD && DVD && !CDR && !DVDR)
+		finalData += "CD/DVD Drive: CD/DVD\n";
+	if(CDR && DVD && !DVDR)
+		finalData += "CD/DVD Drive: CD-RW/DVD\n";
+	if(CDR && DVDR)
+		finalData += "CD/DVD Drive: CD-RW/DVD-RW\n";
+	if(!CD && !CDR && !DVD && !DVDR)	
+		finalData += "CD/DVD Drive: N/A\n";
+
+
+
+			
+	return finalData;
+}
+/*
+	This function is meant to make the process of removing substrings/chars from strings easier
+*/
+string removeSubString(string original, string toRemove)
+{
+	string temp;
+	original.erase(remove(original.begin(), original.end(), '\t'), original.end());
+	return original;
 }
 /*
 	This function is meant to make the process of calling for output of system commands easier
