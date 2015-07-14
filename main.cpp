@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -11,8 +13,10 @@ void helpMenu();
 string comments();
 void writeToFile(string collectedInfo, string triageNum);
 string getTriageNumber(string theId);
+string getMacData();
+string getLinuxData();
 bool macOrLinux();
-
+string runCmd(string cmd);
 
 int main(int argc, char *argv[])
 {
@@ -59,6 +63,7 @@ int main(int argc, char *argv[])
 	if(macOrLinux())
 	{
 		cout << "Linux computer detected!..." << endl;
+		getLinuxData();
 	}
 	else
 	{
@@ -146,7 +151,7 @@ string comments()
 	{
 		if(comment.find("@okay") == string::npos && comment.find("@notokay") == string::npos)
 		{
-			cout << "No, seriously I need you to have a minimum of '@okay' or @notokay in that comment." << endl;
+			cout << "No, seriously I need you to have a minimum of '@okay' or '@notokay' in that comment." << endl;
 			cout << "Press enter to continue..." << endl;
 			getline(cin, comment);
 			cout << "-------------------------" << endl;
@@ -181,6 +186,66 @@ void writeToFile(string collectedInfo, string triageNum)
 		newFile << collectedInfo;
 	}
 	newFile.close();
+}
+/*
+*/
+string getLinuxData()
+{
+	string data = runCmd("sudo dmidecode -t system");
+	string temp = "";
+	istringstream iss(data);
+	for(string line; getline(iss, line);)
+	{
+		if(line.find("Manu") != string::npos)
+		{
+			line.erase(remove(line.begin(), line.end(), '\t'), line.end());
+
+			cout << line << endl;
+		
+		}
+		if(line.find("Version") != string::npos)
+			cout << line << endl;
+		if(line.find("Serial") != string::npos)
+			cout << line << endl;	
+
+	}
+	return data;
+}
+/*
+	This function is meant to make the process of calling for output of system commands easier
+	it uses popen and pipes to capture output as a string, if the command fails to run the
+	entire program will exit
+	
+	@params:
+		string cmd | the command that is to be run
+	@return:
+		string | the entire output of the command that was run
+*/
+string runCmd(string cmd)
+{
+	FILE* pipe = popen(cmd.c_str(), "r");
+	if(!pipe)
+	{
+		cout << "The command '" << cmd << "' has failed!" << endl;
+		cout << "This is not good, please tell Kevin or Dom!" << endl;
+		cout << "Program will now exit!" << endl;
+		exit(1);
+	}
+	char buffer[128];
+	string temp = "";
+	while(!feof(pipe))
+	{
+		if(fgets(buffer,128,pipe) != NULL)
+			temp += buffer;
+	}
+	pclose(pipe);
+	return temp;
+}
+/*
+*/	
+string getMacData()
+{
+	return "";
 }
 /*
 	This function uses the uname command to determine the type of system it is running on as the commands 
