@@ -47,8 +47,6 @@ int main(int argc, char *argv[])
 		else
 		{
 			cout << "Unknown option \'" << argv[i] << "\';" << endl;
-			cout << "ABORT!ABORT!ABORT!\nABANDON SHIP!!!!!!\nMAYDAY!!!MAYDAY!!!" << endl;
-			cout << "YOU FORGOT HOW TO READ THE HELP MENU!!!" << endl;
 			cout << "Try using \'-h\' or \'--help\' for usage options." << endl;
 			cout << "Press any key to continue" << endl;
 			getline(cin, data);
@@ -87,7 +85,8 @@ void helpMenu()
 	cout << "This is the triage application, used to extract data from" << endl;
 	cout << "refurbished Mac and Linux computers. It is written in C/C++" << endl;
 	cout << "by Dominic DiPasquale. Source is avaliable here:" << endl;
-	cout << "https://github.com/domtheporcupine/triageC" << endl;
+	cout << "DEV: https://github.com/domtheporcupine/triageC" << endl;
+	cout << "OFFICIAL: https://github.com/computerreach/triageC" << endl;
 	cout << "----------------------" << endl;
 	cout << "Usage: crdata [options]" << endl;
 	cout << "Options:" << endl;
@@ -142,6 +141,7 @@ string getTriageNumber(string theId)
 */
 string comments()
 {
+	cout << "------------------------" << endl;
 	cout << "Please review the above synopsis and provide any comments you deem" << endl;
 	cout << "neccesary below. As a minimum you must enter '@okay' if the " << endl;
 	cout << "majority of the information is correct, or '@notokay' if the info " << endl;
@@ -176,7 +176,7 @@ string comments()
 		string collectedInfo | info collected by the script and the comments given by the user
 		string triageNum | the CRT identification number
 	@return:
-		none
+		void
 
 */
 void writeToFile(string collectedInfo, string triageNum)
@@ -312,10 +312,6 @@ string getLinuxData()
 			DVDR = true;
 	}
 
-
-
-
-
 	finalData += "Video Devices:\n";
 	if(VGA)
 		finalData += "-VGA\n";
@@ -327,7 +323,12 @@ string getLinuxData()
 	if(ETHERNET)
 		finalData += "-ETHERNET\n";
 	if(USB)
-		finalData += "-USB x " + usbCount + '\n';
+	{
+		string usbNum;
+		ostringstream temp;
+		temp << usbCount;
+		finalData += "-USB x " + temp.str() + '\n';
+	}
 	if(PS2)
 		finalData += "-PS/2\n";
 	finalData += "--------------------\nOther Ports:\n";
@@ -348,14 +349,21 @@ string getLinuxData()
 		finalData += "CD/DVD Drive: CD-RW/DVD-RW\n";
 	if(!CD && !CDR && !DVD && !DVDR)	
 		finalData += "CD/DVD Drive: N/A\n";
+		
+	finalData += "--------------------\nInternet:\n";
+	if(WIFI)
+		finalData += "Wifi Enabled\n";
 
-
-
-			
 	return finalData;
 }
 /*
 	This function is meant to make the process of removing substrings/chars from strings easier
+	
+	@params:
+		string original | the string from which the substring will be removed
+		string toRemove | the substring that will be removed from the original
+	@return
+		string | the new string without the substring
 */
 string removeSubString(string original, string toRemove)
 {
